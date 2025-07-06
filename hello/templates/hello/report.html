@@ -1,0 +1,93 @@
+{% extends "hello/layout.html" %}
+{% load extra_filters %}
+{% block title %}Báo cáo chi tiêu{% endblock %}
+{% block content %}
+<style>
+    table.table td, table.table th {
+        vertical-align: middle;
+        text-align: center;
+    }
+    table.table thead th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+    }
+</style>
+
+<h2>Báo cáo chi tiêu</h2>
+<form method="get" class="row g-3 mb-4">
+    <div class="col-md-3">
+        <input type="month" name="month" class="form-control" value="{{ month }}">
+    </div>
+    <div class="col-md-3">
+        <select name="status" class="form-control">
+            <option value="">Tất cả trạng thái</option>
+            {% for key, value in status_choices %}
+            <option value="{{ key }}" {% if status == key %}selected{% endif %}>{{ value }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-3">
+        <input type="text" name="employee" class="form-control" placeholder="Người tạo" value="{{ employee }}">
+    </div>
+    <div class="col-md-3">
+        <button class="btn btn-primary">Lọc</button>
+    </div>
+</form>
+<div class="row mb-4">
+    <div class="col">
+        <div class="card p-3 text-center">
+            <h5>Tổng đề xuất đã duyệt</h5>
+            <h3>{{ total_approved }}</h3>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card p-3 text-center">
+            <h5>Số tiền đã chi</h5>
+            <h3>{{ total_amount|format_vnd }} VNĐ</h3>
+        </div>
+    </div>
+</div>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>STT</th>
+            <th>Loại chi</th>
+            <th>Người tạo</th>
+            <th>Nội dung</th>
+            <th>Số lượng</th>
+            <th>Đơn giá</th>
+            <th>Thành tiền</th>
+            <th>Ngày duyệt</th>
+            <th>Trạng thái</th>
+            <th>Thao tác</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for req in requests %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ req.employee.username }}</td>
+            <td>{{ req.get_expense_type_display }}</td>
+            <td>{{ req.content }}</td>
+            <td>{{ req.quantity }}</td>
+            <td>{{ req.unit_price|format_vnd }} VNĐ</td>
+            <td>{{ req.total_price|format_vnd }} VNĐ</td>
+            <td>{{ req.updated_at|date:"d/m/Y" }}</td>
+            <td>{{ req.get_status_display }}</td>
+            <td>
+                <a href="{% url 'expense_detail' req.pk %}" class="btn btn-sm btn-primary">Chi tiết</a>
+                {% if request.user.is_superuser or permissions|get:request.user.id %}
+                    <a href="{% url 'expense_edit' req.pk %}" class="btn btn-sm btn-warning">Sửa</a>
+                    <a href="{% url 'expense_delete' req.pk %}" class="btn btn-sm btn-danger">Xóa</a>
+                {% elif req.employee == request.user %}
+                    <a href="{% url 'expense_edit' req.pk %}" class="btn btn-sm btn-warning">Sửa</a>
+                    <a href="{% url 'expense_delete' req.pk %}" class="btn btn-sm btn-danger">Xóa</a>
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="9">Không có dữ liệu.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

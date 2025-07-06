@@ -1,0 +1,29 @@
+{% extends "hello/layout.html" %}
+{% load extra_filters %}
+{% block title %}Danh sách người dùng{% endblock %}
+{% load static %}
+
+
+{% block content %}
+
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Truyền dữ liệu từ Django sang JS -->
+<script>
+    const STATUS_LABELS = JSON.parse(document.getElementById('status-labels').textContent);
+    const STATUS_COUNTS = JSON.parse(document.getElementById('status-counts').textContent);
+    const STATUS_AMOUNTS = JSON.parse(document.getElementById('status-amounts').textContent);
+</script>
+<!-- Nhúng file JS riêng -->
+<script src="{% static 'js/home_chart.js' %}"></script>
+
+<div class="container mb-5">
+    <h4 class="text-center mb-3">Biểu đồ số lượng đề xuất theo trạng thái</h4>
+    <canvas id="statusChart" height="80"></canvas>
+</div>
+
+{{ status_labels|json_script:"status-labels" }}
+{{ status_counts|json_script:"status-counts" }}
+{{ status_amounts|json_script:"status-amounts" }}
+{% endblock %}

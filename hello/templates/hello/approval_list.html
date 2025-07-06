@@ -1,0 +1,82 @@
+{% extends "hello/layout.html" %}
+{% load extra_filters %}
+{% block title %}Danh sách đề xuất chờ duyệt{% endblock %}
+{% block content %}
+<style>
+    table.table td, table.table th {
+        vertical-align: middle;
+        text-align: center;
+    }
+    table.table thead th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+    }
+</style>
+
+{% if messages %}
+  <div class="container mt-3">
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+<h2>Đề xuất chờ duyệt</h2>
+<ul class="nav nav-tabs mb-3">
+  <li class="nav-item">
+    <a class="nav-link {% if tab == 'manager' %}active{% endif %}" href="?tab=manager">Chờ trưởng bộ phận</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link {% if tab == 'accountant' %}active{% endif %}" href="?tab=accountant">Chờ kế toán</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link {% if tab == 'director' %}active{% endif %}" href="?tab=director">Chờ giám đốc</a>
+  </li>
+</ul>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>STT</th>
+            <th>Người tạo</th>
+            <th>Loại chi</th>
+            <th>Nội dung</th>
+            <th>Số lượng</th>
+            <th>Đơn giá</th>
+            <th>Thành tiền</th>
+            <th>Trạng thái</th>
+            <th>Ngày tạo</th>
+            <th>Hành động</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for req in requests %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ req.employee.username }}</td>
+            <td>{{ req.get_expense_type_display }}</td>
+            <td>{{ req.content }}</td>
+            <td>{{ req.quantity }}</td>
+            <td>{{ req.unit_price|format_vnd }} VNĐ</td>
+            <td>{{ req.total_price|format_vnd }} VNĐ</td>
+            <td>{{ req.get_status_display }}</td>
+            <td>{{ req.created_at|date:"d/m/Y" }}</td>
+            <td>
+                <a href="{% url 'approval_detail' req.id %}" class="btn btn-sm btn-primary">Chi tiết</a>
+                {% if request.user.is_superuser or permissions|get:request.user.id %}
+                    <a href="{% url 'expense_edit' req.pk %}" class="btn btn-sm btn-warning">Sửa</a>
+                    <a href="{% url 'expense_delete' req.pk %}" class="btn btn-sm btn-danger">Xóa</a>
+                {% elif req.employee == request.user %}
+                    <a href="{% url 'expense_edit' req.pk %}" class="btn btn-sm btn-warning">Sửa</a>
+                    <a href="{% url 'expense_delete' req.pk %}" class="btn btn-sm btn-danger">Xóa</a>
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="10">Không có đề xuất nào.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

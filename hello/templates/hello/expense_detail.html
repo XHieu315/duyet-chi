@@ -1,0 +1,26 @@
+{% extends "hello/layout.html" %}
+{% block title %}Xem chi tiết đề xuất{% endblock %}
+{% block content %}
+<h2>Chi tiết đề xuất chi</h2>
+<div class="card mb-3">
+    <div class="card-body">
+        <p><b>Người tạo:</b> {{ req.employee.username }}</p>
+        <p><b>Loại chi:</b> {{ req.get_expense_type_display }}</p>
+        <p><b>Nội dung:</b> {{ req.content }}</p>
+        <p><b>Số lượng:</b> {{ req.quantity }}</p>
+        <p><b>Đơn giá:</b> {{ req.unit_price|floatformat:0 }} VNĐ</p>
+        <p><b>Thành tiền:</b> {{ req.total_price|floatformat:0 }} VNĐ</p>
+        <p><b>Lý do:</b> {{ req.reason }}</p>
+        <p><b>Trạng thái:</b> {{ req.get_status_display }}</p>
+        <p><b>Ngày tạo:</b> {{ req.created_at|date:"d/m/Y H:i" }}</p>
+        <p><b>Trạng thái:</b> {{ req.get_status_display }}</p>
+        {% if req.invoice_image %}
+            <p><b>Ảnh hóa đơn:</b><br><img src="{{ req.invoice_image.url }}" width="300"></p>
+        {% endif %}
+        
+    </div>
+</div>
+<div class="text-end">
+    <button type="button" class="btn btn-secondary" onclick="window.history.back();">Quay lại</button>
+</div>
+{% endblock %}

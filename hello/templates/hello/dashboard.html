@@ -1,0 +1,73 @@
+{% extends "hello/layout.html" %}
+{% load extra_filters %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<style>
+    table.table td, table.table th {
+        vertical-align: middle;
+        text-align: center;
+    }
+    table.table thead th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+    }
+</style>
+
+<h2>Bảng Điều Khiển</h2>
+<div class="row mb-4">
+    <div class="col">
+        <div class="card p-3 text-center">
+            <h5>Đề xuất đang chờ duyệt</h5>
+            <h3>{{ waiting_count }}</h3>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card p-3 text-center">
+            <h5>Tổng tiền đã duyệt</h5>
+            <h3>{{ approved_amount|format_vnd}} VNĐ</h3>
+        </div>
+    </div>
+</div>
+<h4>Đề xuất gần đây</h4>
+<a href="{% url 'expense_add' %}" class="btn btn-primary mb-3">Tạo đề xuất chi</a>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>STT</th>
+            <th>Loại chi</th>
+            <th>Nội dung</th>
+            <th>Số lượng</th>
+            <th>Đơn giá</th>
+            <th>Thành tiền</th>
+            <th>Trạng thái</th>
+            <th>Ngày tạo</th>
+            <th>Hành động</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for req in recent_requests %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ req.get_expense_type_display }}</td>
+            <td>{{ req.content }}</td>
+            <td>{{ req.quantity }}</td>
+            <td>{{ req.unit_price|format_vnd }} VNĐ</td>
+            <td>{{ req.total_price|format_vnd }} VNĐ</td>
+            <td>{{ req.get_status_display }}</td>
+            <td>{{ req.created_at|date:"d/m/Y" }}</td>
+            <td>
+                {% if request.user.is_superuser or permissions|get:request.user.id %}
+                    <a href="{% url 'expense_edit' req.pk %}" class="btn btn-sm btn-warning">Sửa</a>
+                    <a href="{% url 'expense_delete' req.pk %}" class="btn btn-sm btn-danger">Xóa</a>
+                {% elif req.employee == request.user %}
+                    <a href="{% url 'expense_edit' req.pk %}" class="btn btn-sm btn-warning">Sửa</a>
+                    <a href="{% url 'expense_delete' req.pk %}" class="btn btn-sm btn-danger">Xóa</a>
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="9">Không có đề xuất nào.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

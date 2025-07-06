@@ -1,0 +1,73 @@
+{% extends "hello/layout.html" %}
+{% load extra_filters %}
+{% block title %}Danh sách người dùng{% endblock %}
+
+{% block content %}
+
+<style>
+    table.table td, table.table th {
+        vertical-align: middle;
+        text-align: center;
+    }
+    table.table thead th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+    }
+</style>
+
+<div class="container mt-5">
+    <h2 class="mb-4 text-center text-primary">Danh sách quyền chỉnh sửa đề xuất chi</h2>
+
+    {% if users %}
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>STT</th>
+                        <th>Tên đăng nhập</th>
+                        <th>Email</th>
+                        <th>Ngày tham gia</th>
+                        <th>Quyền chỉnh sửa/xóa</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ user.username }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user.date_joined|date:"d/m/Y H:i" }}</td>
+                            <td>
+                                {% if permissions|get:user.id %}
+                                    <span class="badge bg-success">Được phép</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Không</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if request.user.is_superuser %}
+                                    <form method="post" action="{% url 'toggle_edit_permission' user.id %}" style="display:inline;">
+                                        {% csrf_token %}
+                                        {% if permissions|get:user.id %}
+                                            <button type="submit" class="btn btn-sm btn-danger">Thu hồi quyền</button>
+                                        {% else %}
+                                            <button type="submit" class="btn btn-sm btn-success">Cấp quyền</button>
+                                        {% endif %}
+                                    </form>
+                                    <form method="post" action="{% url 'delete_user' user.id %}" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa tài khoản này?');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-danger ms-1">Xóa</button>
+                                    </form>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="text-center text-muted">Không có người dùng nào.</p>
+    {% endif %}
+</div>
+{% endblock %}

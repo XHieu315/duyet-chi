@@ -1,0 +1,42 @@
+{% extends "hello/layout.html" %}
+{% block title %}Thêm mới đề xuất chi{% endblock %}
+{% block content %}
+
+<style>
+    form input, form select, form textarea {
+        width: 100% !important;
+        padding: .375rem .75rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        color: #495057;
+        background-color: #fff;
+        background-clip: padding-box;
+        border: 1px solid #ced4da;
+        border-radius: .25rem;
+        box-sizing: border-box;
+    }
+    #id_content, #id_reason {
+        height: 100px !important;
+    }
+</style>
+
+<h2 class="mb-4 ">Cập nhật đề xuất chi</h2>
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Biểu mẫu đề xuất</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit" class="btn btn-success">Cập nhật</button>
+                    <button type="button" class="btn btn-secondary" onclick="window.history.back();">Quay lại</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends "hello/layout.html" %}
+{% block title %}Xóa đề xuất chi{% endblock %}
+{% block content %}
+<h2>Xóa đề xuất chi</h2>
+<p>Bạn có chắc chắn muốn xóa đề xuất chi <strong>{{ expense.get_expense_type_display }}</strong> số tiền <strong>{{ expense.amount }}</strong>?</p>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Xóa</button>
+    <a href="{% url 'dashboard' %}" class="btn btn-secondary">Hủy</a>
+</form>
+{% endblock %}
